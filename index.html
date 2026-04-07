@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de Evaluación de Riesgos Laborales</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="encabezado-fijo">
+    <div class="encabezado-contenido">
+      <div class="branding">
+        <!-- Reemplaza este SVG por el logo oficial cuando esté disponible -->
+        <img id="logoCorporativo" class="logo-corporativo" src="assets/logo-provisorio.svg" alt="Logo corporativo" />
+        <h1 class="titulo-principal">Formulario de Evaluación de Riesgos Laborales</h1>
+      </div>
+      <div class="progreso">
+        <div class="progreso-top">
+          <span id="textoPaso">Paso 1 de 6</span>
+          <span id="textoPorcentaje">0%</span>
+        </div>
+        <div class="barra"><div class="barra-relleno" id="barraRelleno"></div></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="tarjeta pantalla activa" id="pantallaInicio">
+      <h2 class="subtitulo">Datos iniciales de la evaluación</h2>
+      <p class="descripcion">Complete todos los campos antes de iniciar la matriz de identificación de peligros.</p>
+
+      <div class="logo-upload-wrap">
+        <label for="inputLogo">Opcional: subir logo corporativo (SVG/PNG/JPG) para personalizar la vista</label>
+        <input type="file" id="inputLogo" accept="image/svg+xml,image/png,image/jpeg" />
+      </div>
+
+      <div class="grid-inicio" id="contenedorCamposInicio"></div>
+      <div class="mensaje-confidencial">
+        Los datos ingresados son confidenciales y serán utilizados exclusivamente para la evaluación interna dictada por la empresa mandante CMPC.
+      </div>
+    </section>
+
+    <section class="tarjeta pantalla" id="pantallaBloque"></section>
+
+    <section class="tarjeta pantalla" id="pantallaResumen">
+      <h2 class="subtitulo">Revisión final</h2>
+      <p class="descripcion">Revise la información ingresada antes de enviar.</p>
+      <div id="contenidoResumen"></div>
+    </section>
+
+    <section class="tarjeta pantalla" id="pantallaExito">
+      <div class="exito">
+        <h3>✅ Formulario enviado correctamente</h3>
+        <p>La información fue registrada localmente y se imprimió en la consola para pruebas.</p>
+        <p>Además, el correo queda marcado como usado para evitar registros duplicados en esta versión local.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="acciones">
+    <div class="acciones-contenido">
+      <button class="btn-secundario" id="btnAnterior">Anterior</button>
+      <button class="btn-primario" id="btnSiguiente">Siguiente</button>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
