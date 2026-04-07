@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de Evaluación de Riesgos Laborales</title>
+  <style>
+    :root {
+      --color-primario: #0f4c81;
+      --color-primario-oscuro: #0a3559;
+      --color-fondo: #f4f7fb;
+      --color-superficie: #ffffff;
+      --color-borde: #d9e2ec;
+      --color-texto: #1f2937;
+      --color-texto-secundario: #4b5563;
+      --color-ok: #0b7a3d;
+      --color-error: #b42318;
+      --radio-si: #146c43;
+      --radio-no: #b42318;
+      --radio-na: #6b7280;
+      --sombra: 0 8px 24px rgba(15, 76, 129, 0.08);
+      --radio-size: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      line-height: 1.4;
+    }
+
+    .encabezado-fijo {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, var(--color-primario), var(--color-primario-oscuro));
+      color: #fff;
+      padding: 14px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .encabezado-contenido {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .titulo-principal {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .progreso {
+      min-width: 220px;
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .progreso-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      opacity: 0.95;
+    }
+
+    .barra {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.28);
+      overflow: hidden;
+    }
+
+    .barra-relleno {
+      height: 100%;
+      width: 0%;
+      background: #7dd3fc;
+      transition: width 0.3s ease;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 22px auto 110px;
+      padding: 0 16px;
+    }
+
+    .tarjeta {
+      background: var(--color-superficie);
+      border: 1px solid var(--color-borde);
+      border-radius: 16px;
+      box-shadow: var(--sombra);
+      padding: 22px;
+    }
+
+    .pantalla { display: none; }
+    .pantalla.activa { display: block; }
+
+    .subtitulo {
+      margin: 0 0 6px;
+      color: var(--color-primario);
+      font-size: 1.35rem;
+    }
+
+    .descripcion {
+      margin: 0 0 20px;
+      color: var(--color-texto-secundario);
+    }
+
+    .grid-inicio {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .campo label {
+      font-weight: 600;
+      color: var(--color-texto);
+      font-size: 0.95rem;
+    }
+
+    .campo input {
+      border: 1px solid var(--color-borde);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .campo input:focus {
+      border-color: var(--color-primario);
+      box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.16);
+    }
+
+    .campo.error input { border-color: var(--color-error); }
+    .campo .error-texto {
+      color: var(--color-error);
+      font-size: 0.84rem;
+      display: none;
+    }
+
+    .campo.error .error-texto { display: block; }
+
+    .bloque-info {
+      padding: 12px 14px;
+      border: 1px solid #cfe0f2;
+      border-radius: 12px;
+      background: #f7fbff;
+      margin-bottom: 16px;
+      color: var(--color-texto-secundario);
+      font-size: 0.95rem;
+    }
+
+    .matriz-wrap { overflow-x: auto; }
+
+    table.matriz {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 680px;
+      border: 1px solid var(--color-borde);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .matriz th,
+    .matriz td {
+      padding: 12px;
+      border-bottom: 1px solid var(--color-borde);
+      text-align: center;
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .matriz tr:last-child td { border-bottom: none; }
+
+    .matriz th {
+      background: #f8fbff;
+      color: var(--color-texto);
+      font-size: 0.92rem;
+    }
+
+    .matriz .col-factor {
+      text-align: left;
+      width: 64%;
+      font-weight: 500;
+      color: var(--color-texto);
+    }
+
+    .matriz label.radio {
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: background 0.2s;
+    }
+
+    .matriz label.radio:hover { background: #f3f8ff; }
+
+    .matriz input[type="radio"] {
+      width: var(--radio-size);
+      height: var(--radio-size);
+      accent-color: var(--color-primario);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .radio.si input { accent-color: var(--radio-si); }
+    .radio.no input { accent-color: var(--radio-no); }
+    .radio.na input { accent-color: var(--radio-na); }
+
+    .mensaje-validacion {
+      margin-top: 12px;
+      color: var(--color-error);
+      font-weight: 600;
+      display: none;
+    }
+
+    .mensaje-validacion.visible { display: block; }
+
+    .resumen-meta, .resumen-bloque {
+      border: 1px solid var(--color-borde);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+
+    .resumen-meta h4,
+    .resumen-bloque h4 {
+      margin: 0 0 10px;
+      color: var(--color-primario);
+    }
+
+    .lista-resumen {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--color-texto);
+    }
+
+    .lista-resumen li { margin: 6px 0; }
+
+    .exito {
+      text-align: center;
+      padding: 36px 18px;
+    }
+
+    .exito h3 {
+      color: var(--color-ok);
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .acciones {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(6px);
+      border-top: 1px solid var(--color-borde);
+      padding: 10px 16px;
+      z-index: 110;
+    }
+
+    .acciones-contenido {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.02s ease, opacity 0.2s;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .btn-secundario {
+      background: #e8eef5;
+      color: #234;
+    }
+
+    .btn-primario {
+      background: var(--color-primario);
+      color: #fff;
+    }
+
+    .btn-primario:hover { background: #0d406b; }
+    button[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+    @media (max-width: 820px) {
+      .grid-inicio { grid-template-columns: 1fr; }
+      .titulo-principal { font-size: 0.98rem; }
+      .subtitulo { font-size: 1.2rem; }
+      main { padding: 0 12px; }
+      .tarjeta { padding: 18px; }
+      .matriz th,
+      .matriz td { padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="encabezado-fijo">
+    <div class="encabezado-contenido">
+      <h1 class="titulo-principal">Formulario de Evaluación de Riesgos Laborales</h1>
+      <div class="progreso">
+        <div class="progreso-top">
+          <span id="textoPaso">Paso 1 de 6</span>
+          <span id="textoPorcentaje">0%</span>
+        </div>
+        <div class="barra"><div class="barra-relleno" id="barraRelleno"></div></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="tarjeta pantalla activa" id="pantallaInicio">
+      <h2 class="subtitulo">Datos iniciales de la evaluación</h2>
+      <p class="descripcion">Complete los datos del trabajador antes de iniciar la matriz de identificación de peligros.</p>
+      <div class="grid-inicio" id="contenedorCamposInicio"></div>
+    </section>
+
+    <section class="tarjeta pantalla" id="pantallaBloque"></section>
+
+    <section class="tarjeta pantalla" id="pantallaResumen">
+      <h2 class="subtitulo">Revisión final</h2>
+      <p class="descripcion">Revise la información ingresada antes de enviar.</p>
+      <div id="contenidoResumen"></div>
+    </section>
+
+    <section class="tarjeta pantalla" id="pantallaExito">
+      <div class="exito">
+        <h3>✅ Formulario enviado correctamente</h3>
+        <p>La información fue registrada de forma local en memoria para pruebas y se imprimió en la consola del navegador.</p>
+        <p><strong>Siguiente paso sugerido:</strong> conectar la función de envío con Google Apps Script.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="acciones">
+    <div class="acciones-contenido">
+      <button class="btn-secundario" id="btnAnterior">Anterior</button>
+      <button class="btn-primario" id="btnSiguiente">Siguiente</button>
+    </div>
+  </footer>
+
+  <script>
+    /*
+      ========================================================
+      CONFIGURACIÓN DEL FORMULARIO
+      - Aquí puedes editar campos iniciales y bloques de riesgos.
+      - La interfaz se construye dinámicamente para escalar fácil.
+      ========================================================
+    */
+
+    // Campos de la pantalla inicial
+    const camposInicio = [
+      { id: "nombreTrabajador", etiqueta: "Nombre del trabajador", tipo: "text", obligatorio: true },
+      { id: "areaDepartamento", etiqueta: "Área o departamento", tipo: "text", obligatorio: true },
+      { id: "cargo", etiqueta: "Cargo", tipo: "text", obligatorio: true },
+      { id: "fechaEvaluacion", etiqueta: "Fecha de evaluación", tipo: "date", obligatorio: true }
+    ];
+
+    // Bloques de riesgo (plantilla escalable para cientos de preguntas)
+    const bloquesRiesgo = [
+      {
+        id: "caida_mismo_nivel",
+        titulo: "CAÍDA A MISMO NIVEL",
+        descripcion: "Factores asociados a tropiezos, deslizamientos y pérdida de equilibrio en superficies de trabajo.",
+        factores: [
+          "Falta de atención o distracción al caminar",
+          "Prisas o movimientos bruscos que afectan el equilibrio",
+          "Falta de capacitación sobre prevención de caídas",
+          "No uso de calzado adecuado para la actividad laboral",
+          "Superficies húmedas o con obstáculos en zonas de paso"
+        ]
+      },
+      {
+        id: "riesgo_electrico",
+        titulo: "RIESGO ELÉCTRICO",
+        descripcion: "Condiciones inseguras por contacto directo o indirecto con energía eléctrica.",
+        factores: [
+          "Cables expuestos o con aislamiento deteriorado",
+          "Uso de extensiones no autorizadas o sobrecargadas",
+          "Tableros eléctricos sin señalización o protección",
+          "Intervenciones sin bloqueo y etiquetado (LOTO)",
+          "Falta de inspecciones periódicas de equipos eléctricos"
+        ]
+      },
+      {
+        id: "riesgo_ergonomico",
+        titulo: "RIESGO ERGONÓMICO",
+        descripcion: "Factores que pueden generar fatiga, lesiones musculoesqueléticas o sobrecarga física.",
+        factores: [
+          "Posturas forzadas mantenidas durante la jornada",
+          "Movimientos repetitivos de alta frecuencia",
+          "Manipulación manual de cargas sin técnica adecuada",
+          "Diseño inadecuado del puesto de trabajo",
+          "Pausas activas insuficientes o inexistentes"
+        ]
+      }
+    ];
+
+    const opcionesLikert = ["Sí", "No", "N/A"];
+
+    // Estado global de navegación y respuestas
+    const estado = {
+      pasoActual: 0, // 0=inicio, 1..N=bloques, N+1=resumen, N+2=éxito
+      datosInicio: {},
+      respuestas: {}
+    };
+
+    const totalPasosNavegables = 1 + bloquesRiesgo.length + 1; // inicio + bloques + resumen
+
+    // Referencias de UI
+    const ui = {
+      textoPaso: document.getElementById("textoPaso"),
+      textoPorcentaje: document.getElementById("textoPorcentaje"),
+      barraRelleno: document.getElementById("barraRelleno"),
+      pantallaInicio: document.getElementById("pantallaInicio"),
+      contenedorCamposInicio: document.getElementById("contenedorCamposInicio"),
+      pantallaBloque: document.getElementById("pantallaBloque"),
+      pantallaResumen: document.getElementById("pantallaResumen"),
+      contenidoResumen: document.getElementById("contenidoResumen"),
+      pantallaExito: document.getElementById("pantallaExito"),
+      btnAnterior: document.getElementById("btnAnterior"),
+      btnSiguiente: document.getElementById("btnSiguiente")
+    };
+
+    // Construye campos de inicio
+    function construirPantallaInicio() {
+      ui.contenedorCamposInicio.innerHTML = "";
+      camposInicio.forEach((campo) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "campo";
+        wrapper.dataset.campoId = campo.id;
+
+        const label = document.createElement("label");
+        label.setAttribute("for", campo.id);
+        label.textContent = campo.etiqueta;
+
+        const input = document.createElement("input");
+        input.id = campo.id;
+        input.name = campo.id;
+        input.type = campo.tipo;
+        input.required = campo.obligatorio;
+        input.autocomplete = "off";
+
+        input.addEventListener("input", () => {
+          estado.datosInicio[campo.id] = input.value;
+          wrapper.classList.remove("error");
+        });
+
+        const error = document.createElement("span");
+        error.className = "error-texto";
+        error.textContent = "Este campo es obligatorio.";
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        wrapper.appendChild(error);
+        ui.contenedorCamposInicio.appendChild(wrapper);
+      });
+    }
+
+    // Crea la matriz del bloque actual
+    function construirPantallaBloque(indiceBloque) {
+      const bloque = bloquesRiesgo[indiceBloque];
+      if (!bloque) return;
+
+      if (!estado.respuestas[bloque.id]) {
+        estado.respuestas[bloque.id] = {};
+      }
+
+      let filasHtml = "";
+      bloque.factores.forEach((factor, idx) => {
+        const claveFila = `factor_${idx}`;
+        const nameGrupo = `${bloque.id}_${claveFila}`;
+        const valorSeleccionado = estado.respuestas[bloque.id][claveFila] || "";
+
+        const celdasOpciones = opcionesLikert.map((opcion) => {
+          const checked = valorSeleccionado === opcion ? "checked" : "";
+          const clase = opcion === "Sí" ? "si" : opcion === "No" ? "no" : "na";
+          return `
+            <td>
+              <label class="radio ${clase}">
+                <input type="radio" name="${nameGrupo}" value="${opcion}" ${checked} data-bloque-id="${bloque.id}" data-fila="${claveFila}" />
+              </label>
+            </td>
+          `;
+        }).join("");
+
+        filasHtml += `
+          <tr>
+            <td class="col-factor">${factor}</td>
+            ${celdasOpciones}
+          </tr>
+        `;
+      });
+
+      ui.pantallaBloque.innerHTML = `
+        <h2 class="subtitulo">${bloque.titulo}</h2>
+        ${bloque.descripcion ? `<p class="descripcion">${bloque.descripcion}</p>` : ""}
+        <div class="bloque-info">Seleccione una opción por cada factor evaluable: <strong>Sí</strong>, <strong>No</strong> o <strong>N/A</strong>.</div>
+        <div class="matriz-wrap">
+          <table class="matriz" aria-label="Matriz de evaluación de ${bloque.titulo}">
+            <thead>
+              <tr>
+                <th class="col-factor">Factor evaluable</th>
+                <th>Sí</th>
+                <th>No</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>${filasHtml}</tbody>
+          </table>
+        </div>
+        <p class="mensaje-validacion" id="mensajeBloque">Debe responder todas las filas antes de continuar.</p>
+      `;
+
+      ui.pantallaBloque.querySelectorAll('input[type="radio"]').forEach((radio) => {
+        radio.addEventListener("change", (evento) => {
+          const { bloqueId, fila } = evento.target.dataset;
+          if (!estado.respuestas[bloqueId]) estado.respuestas[bloqueId] = {};
+          estado.respuestas[bloqueId][fila] = evento.target.value;
+          const mensaje = document.getElementById("mensajeBloque");
+          mensaje?.classList.remove("visible");
+        });
+      });
+    }
+
+    // Crea resumen previo al envío
+    function construirResumen() {
+      const metaMap = Object.fromEntries(camposInicio.map((c) => [c.id, c.etiqueta]));
+
+      let html = '<div class="resumen-meta"><h4>Datos del trabajador</h4><ul class="lista-resumen">';
+      camposInicio.forEach((campo) => {
+        const valor = estado.datosInicio[campo.id] || "(sin dato)";
+        html += `<li><strong>${metaMap[campo.id]}:</strong> ${valor}</li>`;
+      });
+      html += "</ul></div>";
+
+      bloquesRiesgo.forEach((bloque) => {
+        html += `<div class="resumen-bloque"><h4>${bloque.titulo}</h4><ul class="lista-resumen">`;
+        bloque.factores.forEach((factor, idx) => {
+          const respuesta = estado.respuestas[bloque.id]?.[`factor_${idx}`] || "(sin respuesta)";
+          html += `<li>${factor}: <strong>${respuesta}</strong></li>`;
+        });
+        html += "</ul></div>";
+      });
+
+      ui.contenidoResumen.innerHTML = html;
+    }
+
+    // Validaciones
+    function validarInicio() {
+      let valido = true;
+      camposInicio.forEach((campo) => {
+        const wrapper = ui.contenedorCamposInicio.querySelector(`[data-campo-id="${campo.id}"]`);
+        const input = wrapper?.querySelector("input");
+        const valor = input?.value?.trim();
+
+        if (campo.obligatorio && !valor) {
+          valido = false;
+          wrapper?.classList.add("error");
+        } else {
+          wrapper?.classList.remove("error");
+          estado.datosInicio[campo.id] = input.value;
+        }
+      });
+      return valido;
+    }
+
+    function validarBloque(indiceBloque) {
+      const bloque = bloquesRiesgo[indiceBloque];
+      const respuestasBloque = estado.respuestas[bloque.id] || {};
+      const totalRespondidas = Object.keys(respuestasBloque).length;
+      const completo = totalRespondidas === bloque.factores.length;
+
+      const mensaje = document.getElementById("mensajeBloque");
+      if (!completo) mensaje?.classList.add("visible");
+      return completo;
+    }
+
+    // Navegación
+    function mostrarPaso() {
+      [ui.pantallaInicio, ui.pantallaBloque, ui.pantallaResumen, ui.pantallaExito].forEach((el) => el.classList.remove("activa"));
+
+      if (estado.pasoActual === 0) {
+        ui.pantallaInicio.classList.add("activa");
+      } else if (estado.pasoActual >= 1 && estado.pasoActual <= bloquesRiesgo.length) {
+        ui.pantallaBloque.classList.add("activa");
+        construirPantallaBloque(estado.pasoActual - 1);
+      } else if (estado.pasoActual === bloquesRiesgo.length + 1) {
+        ui.pantallaResumen.classList.add("activa");
+        construirResumen();
+      } else {
+        ui.pantallaExito.classList.add("activa");
+      }
+
+      actualizarCabeceraYBotones();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function actualizarCabeceraYBotones() {
+      const pasoVisible = Math.min(estado.pasoActual + 1, totalPasosNavegables);
+      const porcentaje = Math.round(((pasoVisible - 1) / (totalPasosNavegables - 1)) * 100);
+
+      ui.textoPaso.textContent = `Paso ${pasoVisible} de ${totalPasosNavegables}`;
+      ui.textoPorcentaje.textContent = `${porcentaje}%`;
+      ui.barraRelleno.style.width = `${porcentaje}%`;
+
+      ui.btnAnterior.disabled = estado.pasoActual === 0 || estado.pasoActual > bloquesRiesgo.length + 1;
+
+      if (estado.pasoActual === bloquesRiesgo.length + 1) {
+        ui.btnSiguiente.textContent = "Enviar";
+      } else if (estado.pasoActual > bloquesRiesgo.length + 1) {
+        ui.btnSiguiente.style.display = "none";
+        ui.btnAnterior.style.display = "none";
+      } else {
+        ui.btnSiguiente.textContent = "Siguiente";
+        ui.btnSiguiente.style.display = "inline-block";
+        ui.btnAnterior.style.display = "inline-block";
+      }
+    }
+
+    function siguientePaso() {
+      if (estado.pasoActual === 0 && !validarInicio()) return;
+
+      if (estado.pasoActual >= 1 && estado.pasoActual <= bloquesRiesgo.length) {
+        const indiceBloque = estado.pasoActual - 1;
+        if (!validarBloque(indiceBloque)) return;
+      }
+
+      if (estado.pasoActual === bloquesRiesgo.length + 1) {
+        enviarFormulario();
+        return;
+      }
+
+      estado.pasoActual += 1;
+      mostrarPaso();
+    }
+
+    function pasoAnterior() {
+      if (estado.pasoActual > 0 && estado.pasoActual <= bloquesRiesgo.length + 1) {
+        estado.pasoActual -= 1;
+        mostrarPaso();
+      }
+    }
+
+    // Simulación de envío
+    function enviarFormulario() {
+      const payload = {
+        metadata: {
+          formulario: "Evaluación de Riesgos Laborales",
+          fechaEnvio: new Date().toISOString(),
+          version: "1.0"
+        },
+        trabajador: { ...estado.datosInicio },
+        evaluacion: bloquesRiesgo.map((bloque) => ({
+          bloqueId: bloque.id,
+          bloqueTitulo: bloque.titulo,
+          respuestas: bloque.factores.map((factor, idx) => ({
+            factor,
+            respuesta: estado.respuestas[bloque.id]?.[`factor_${idx}`] || null
+          }))
+        }))
+      };
+
+      // Resultado local para pruebas (puedes reemplazar por fetch POST)
+      console.log("=== DATOS DEL FORMULARIO LISTOS PARA ENVÍO ===");
+      console.log(payload);
+
+      estado.pasoActual = bloquesRiesgo.length + 2;
+      mostrarPaso();
+    }
+
+    // Inicialización
+    function init() {
+      construirPantallaInicio();
+      ui.btnSiguiente.addEventListener("click", siguientePaso);
+      ui.btnAnterior.addEventListener("click", pasoAnterior);
+      mostrarPaso();
+    }
+
+    init();
+  </script>
+</body>
+</html>
